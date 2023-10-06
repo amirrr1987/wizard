@@ -1,56 +1,65 @@
 <template>
-  <q-stepper ref="stepper" color="primary" animated>
-    <q-step
-      :name="1"
-      title="Select campaign settings"
-      icon="settings"
-      :done="step > 1"
-    >
-      For each ad campaign that you create, you can control how much you're
-      willing to spend on clicks and conversions, which networks and
-      geographical locations you want your ads to show on, and more.
-    </q-step>
-
-    <q-step
-      :name="2"
-      title="Create an ad group"
-      caption="Optional"
-      icon="create_new_folder"
-      :done="step > 2"
-    >
-      An ad group contains one or more ads which target a shared set of
-      keywords.
-    </q-step>
-
-    <q-step :name="3" title="Ad template" icon="assignment" disable>
-      This step won't show up because it is disabled.
-    </q-step>
-
-    <q-step :name="4" title="Create an ad" icon="add_comment">
-      Try out different ad text to see what brings in the most customers, and
-      learn how to enhance your ads using features like ad extensions. If you
-      run into any problems with your ads, find out how to tell if they're
-      running and how to resolve approval issues.
-    </q-step>
-
-    <!-- <template v-slot:navigation>
-      <q-stepper-navigation>
-        <q-btn
-          @click="$refs.stepper.next()"
-          color="primary"
-          :label="step === 4 ? 'Finish' : 'Continue'"
-        />
-        <q-btn
-          v-if="step > 1"
-          flat
-          color="primary"
-          @click="$refs.stepper.previous()"
-          label="Back"
-          class="q-ml-sm"
-        />
-      </q-stepper-navigation>
+  <div class="q-pa-md">
+    <!-- <template v-for="(step, stepIndex) in wizardStore.wizard" :key="stepIndex">
+      <div class="">
+        {{ step }}
+      </div>
+      <hr />
     </template> -->
-  </q-stepper>
+    <q-stepper v-model="step" ref="stepper" color="primary" animated>
+      <template
+        v-for="(stepper, stepperIndex) in wizardStore.wizard"
+        :key="stepperIndex"
+      >
+        <q-step
+          :name="stepperIndex"
+          title="Select campaign settings"
+          icon="settings"
+          :done="step > +stepperIndex"
+        >
+          <template v-for="item in stepper.data" :key="item.id">
+            {{ item.name }}
+            <q-radio v-model="shape" :val="item.id" :label="item.name" />
+          </template>
+        </q-step>
+      </template>
+
+      <template v-slot:navigation>
+        <q-stepper-navigation>
+          <q-btn
+            @click="nextCLick"
+            color="primary"
+            :label="step === size(wizardStore.wizard) ? 'Finish' : 'Continue'"
+          />
+          <q-btn
+            v-if="step > 1"
+            flat
+            color="primary"
+            @click="stepper.previous()"
+            label="Back"
+            class="q-ml-sm"
+          />
+        </q-stepper-navigation>
+      </template>
+    </q-stepper>
+    {{ step }}
+    {{ step === size(wizardStore.wizard) }}
+  </div>
 </template>
-<script setup lang="ts"></script>
-<style lang="scss"></style>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useWizardStore } from 'src/stores/KWizard';
+import { size } from 'lodash-es';
+const wizardStore = useWizardStore();
+const step = ref(1);
+const stepper = ref();
+
+const nextCLick = () => {
+  if (step.value < size(wizardStore.wizard)) {
+    step.value += 1;
+    stepper.value.next();
+  }
+};
+const shape = ref()
+</script>

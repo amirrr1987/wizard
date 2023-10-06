@@ -1,5 +1,4 @@
-
-export interface IWizardClass {
+export interface IWizard {
   step1: IStep;
   step2: IStep2;
   step3: IStep;
